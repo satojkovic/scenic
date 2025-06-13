@@ -51,15 +51,22 @@ class ObjectViViT(nn.Module):
   normalise_encoder_output: bool = True
   use_approximate_gelu: bool = True
   dtype: jnp.dtype = jnp.float32
-  object_config: ml_collections.ConfigDict = ml_collections.ConfigDict()
-  detector_configs: ml_collections.ConfigDict = ml_collections.ConfigDict()
-  attach_configs: ml_collections.ConfigDict = ml_collections.ConfigDict()
+  object_config: Optional[ml_collections.ConfigDict] = None
+  detector_configs: Optional[ml_collections.ConfigDict] = None
+  attach_configs: Optional[ml_collections.ConfigDict] = None
 
   @nn.compact
   def __call__(
       self, inputs: jnp.ndarray, boxes: Optional[jnp.ndarray] = None,
       detections: Optional[jnp.ndarray] = None, *,
       train: bool = False, debug: bool = False):
+    if self.object_config is None:
+      self.object_config = ml_collections.ConfigDict()
+    if self.detector_configs is None:
+      self.detector_configs = ml_collections.ConfigDict()
+    if self.attach_configs is None:
+      self.attach_configs = ml_collections.ConfigDict()
+    
     token_score_from_dataloader = self.attach_configs.get(
         'token_score_from_dataloader', False)
     data_has_detection = self.detector_configs.get('use_detector', False) or (

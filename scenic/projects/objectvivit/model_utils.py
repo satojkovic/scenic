@@ -216,9 +216,9 @@ class CustomEncoder(nn.Module):
   num_tokens_per_frame: int = -1
   run_cross_frame_attention: bool = False
   video_batch: int = -1
-  object_config: ml_collections.ConfigDict = ml_collections.ConfigDict()
-  learn_token_configs: ml_collections.ConfigDict = ml_collections.ConfigDict()
-  attach_configs: ml_collections.ConfigDict = ml_collections.ConfigDict()
+  object_config: Optional[ml_collections.ConfigDict] = None
+  learn_token_configs: Optional[ml_collections.ConfigDict] = None
+  attach_configs: Optional[ml_collections.ConfigDict] = None
 
   @nn.compact
   def __call__(self, inputs: jnp.ndarray, empty_mask=None, fg_inds=None,
@@ -239,6 +239,13 @@ class CustomEncoder(nn.Module):
     Returns:
       an array: the updated feature.
     """
+    if self.object_config is None:
+      self.object_config = ml_collections.ConfigDict()
+    if self.learn_token_configs is None:
+      self.learn_token_configs = ml_collections.ConfigDict()
+    if self.attach_configs is None:
+      self.attach_configs = ml_collections.ConfigDict()
+    
     assert inputs.ndim == 3  # (batch, len, emb)
     dtype = jax.dtypes.canonicalize_dtype(self.dtype)
     learn_token = self.learn_token_configs.get('enabled', False)

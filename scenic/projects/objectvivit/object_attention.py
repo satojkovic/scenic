@@ -40,7 +40,7 @@ class ObjectBlock(nn.Module):
   attention_fn: Any = nn.dot_product_attention
   droplayer_p: float = 0.0
   use_approximate_gelu: bool = True
-  configs: ml_collections.ConfigDict = ml_collections.ConfigDict()
+  configs: Optional[ml_collections.ConfigDict] = None
 
   def get_drop_pattern(self, x, deterministic):
     if not deterministic and self.droplayer_p:
@@ -64,6 +64,8 @@ class ObjectBlock(nn.Module):
     Returns:
       x: batch x num_fg_tokens x hidden_dim
     """
+    if self.configs is None:
+      self.configs = ml_collections.ConfigDict()
     num_tokens_per_object = self.configs.get('num_tokens_per_object', 8)
     norm_objects = self.configs.get('norm_objects', False)
     with_objects_linear = self.configs.get('with_objects_linear', True)
