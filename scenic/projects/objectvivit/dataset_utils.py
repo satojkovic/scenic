@@ -50,9 +50,11 @@ def add_image_and_boxes(
     random_flip: bool = True,
     normalization_mean: Union[tf.Tensor, float] = 0,
     normalization_std: Union[tf.Tensor, float] = 1,
-    object_configs: ml_collections.ConfigDict = ml_collections.ConfigDict(),
+    object_configs: Optional[ml_collections.ConfigDict] = None,
 ) -> None:
   """Same as add_image with additional support boxes."""
+  if object_configs is None:
+    object_configs = ml_collections.ConfigDict()
   with_boxes = object_configs.get('with_boxes', False)
   keep_full_frames = object_configs.get('keep_full_frames', 0)
   bbox_key = object_configs.get('bbox_key', 'gt')

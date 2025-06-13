@@ -62,9 +62,11 @@ class ObjectsTFRecordDatasetFactory(TFRecordDatasetFactory):
       one_hot_label: bool = True,
       get_label_str: bool = False,
       label_offset: int = 0,
-      object_configs: ml_collections.ConfigDict = ml_collections.ConfigDict(),
+      object_configs: Optional[ml_collections.ConfigDict] = None,
     ):
     """Adds DMVR pre-processors to the dataset."""
+    if object_configs is None:
+      object_configs = ml_collections.ConfigDict()
 
     objects_dataset_utils.add_image_and_boxes(
         parser_builder=self.parser_builder,
@@ -128,10 +130,12 @@ def load_split(
     label_offset: int = 0,
     train_frame_sampling_mode: str = 'random',
     use_crop_and_resize_video_mae: bool = False,
-    object_configs: ml_collections.ConfigDict = ml_collections.ConfigDict(),
+    object_configs: Optional[ml_collections.ConfigDict] = None,
     num_channels: int = 3,
     ) -> Tuple[tf.data.Dataset, int]:
   """Additionally support loading object boxes."""
+  if object_configs is None:
+    object_configs = ml_collections.ConfigDict()
   dataset = ds_factory(subset=subset).configure(
       is_training=(subset == 'train'),
       num_frames=num_frames,
